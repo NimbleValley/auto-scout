@@ -1,0 +1,36 @@
+button {
+    font-size: 2.75vh;
+    transition: background-color 0.25s, color 0.15s, border-radius 0.25s;
+    background-color: rgb(223, 223, 223);
+    border-radius: 0.5vh;
+}
+
+button:hover {
+    background-color: rgb(82, 82, 82);
+    color: white;
+    cursor: pointer;
+    border-radius: 0vh;
+}
+
+label {
+    font-size: 2.5vh;
+    user-select: none;
+}
+
+input {
+    font-size: 2.75vh;
+    height: 100%;
+    border: 0.25vh solid black;
+    border-radius: 0.5vh;
+}
+
+input:focus  {
+    background-color: rgb(199, 199, 199);
+}
+
+.vertical-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: fit-content;
+}

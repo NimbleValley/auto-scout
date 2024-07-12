@@ -1,0 +1,19 @@
+{
+  "name": "robot-locating",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mason McManus",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "fs": "^0.0.1-security",
+    "http": "^0.0.1-security",
+    "path": "^0.12.7",
+    "youtube-dl-exec": "^3.0.6",
+    "ytdl-core": "^4.11.5"
+  }
+}
