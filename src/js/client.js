@@ -38,6 +38,27 @@ document.getElementById('trim-video-button').addEventListener('click', function 
     let data = {
         "start": getTimes().startTime,
         "end": getTimes().endTime,
+        "trim": true
+    };
+
+    // Post to trim
+    fetch("/trim", {
+        method: "post",
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    }).then(res => {
+        videoTrimContainer.style.display = 'none';
+        statusContainer.style.display = 'flex';
+    });
+});
+
+// The submit button, uploads the video and the trimming data
+document.getElementById('skip-trim-video-button').addEventListener('click', function () {
+    let data = {
+        "start": getTimes().startTime,
+        "end": getTimes().endTime,
+        "trim": false
     };
 
     // Post to trim
