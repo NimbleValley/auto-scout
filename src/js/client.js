@@ -4,9 +4,11 @@ const videoTrimContainer = document.getElementById('video-trim-container');
 const videoUploadContainer = document.getElementById('video-select-container');
 videoUploadContainer.style.display = 'flex';
 
+const selectFrameButton = document.getElementById('select-frame-button');
+var videoFrameTiming = 0;
+
 // Not used as of now, dependency doesn't work
 const youtubeSubmitButton = document.getElementById('youtube-link-submit');
-
 const youtubeFileInput = document.getElementById('youtube-file-input');
 
 // The video that shows where trimming will occur
@@ -15,6 +17,10 @@ const videoPlayer = document.getElementById('trimming-video');
 // Status reading
 const statusContainer = document.getElementById('status-container');
 statusContainer.style.display = 'none';
+
+selectFrameButton.addEventListener('click', function() {
+    videoFrameTiming = videoPlayer.currentTime;
+});
 
 // When the video is loaded (duration changes) update the maximum time for the sliders
 videoPlayer.ondurationchange = updateSliderMax;
@@ -38,7 +44,8 @@ document.getElementById('trim-video-button').addEventListener('click', function 
     let data = {
         "start": getTimes().startTime,
         "end": getTimes().endTime,
-        "trim": true
+        "trim": true,
+        "second": videoFrameTiming
     };
 
     // Post to trim
@@ -58,7 +65,8 @@ document.getElementById('skip-trim-video-button').addEventListener('click', func
     let data = {
         "start": getTimes().startTime,
         "end": getTimes().endTime,
-        "trim": false
+        "trim": false,
+        "second": videoFrameTiming
     };
 
     // Post to trim

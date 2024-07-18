@@ -14,6 +14,7 @@
     "canvas": "^2.11.2",
     "express": "^4.19.2",
     "express-fileupload": "^1.5.0",
+    "ffmpeg-extract-frames": "^2.0.2",
     "fluent-ffmpeg": "^2.1.3",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.2.0",

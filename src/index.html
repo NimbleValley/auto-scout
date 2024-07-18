@@ -36,6 +36,7 @@
         <form ref='uploadForm' id='uploadForm' action='http://localhost:8080/upload' method='post'
             encType="multipart/form-data">
             <input type="file" name="videoFile" id="fake-video-upload">
+            <button id="select-frame-button" type="button">Select Frame</button>
             <button id="trim-video-button" type="submit">Trim Video</button>
             <button id="skip-trim-video-button" type="submit">Skip trim</button>
         </form>
@@ -44,11 +45,22 @@
     <div id="status-container">
         <h2>Status:</h2>
     </div>
+
+    <div id="validate-container">
+        <label for="x-distortion-slider">X-Distortion:</label>
+        <input type="range" name="x-distortion-slider" id="x-distortion-slider" step="0.01" min="0.5" max="1.5" value="0.75">
+        <label for="y-distortion-slider">Y-Distortion:</label>
+        <input type="range" name="y-distortion-slider" id="y-distortion-slider" step="0.01" min="0.5" max="1.5" value="0.95">
+        <canvas id="validate-canvas"></canvas>
+        <button id="submit-distortion-button">Enter</button>
+    </div>
 </body>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="js/trim.js" type="module"></script>
 <script src="js/client.js" type="module"></script>
 <script src="js/status.js" type="module"></script>
+<script src="js/convex-hull.js"></script>
+<script src="js/field-distortion.js" type="module"></script>
 
 </html>

@@ -17,9 +17,11 @@ rf = Roboflow(api_key="1234")
 project = rf.workspace().project("bumper-detection-b8q8f")
 model = project.version("3").model
 
+model.confidence = 25
+
 job_id, signed_url, expire_time = model.predict_video(
     "C:/Users/Owner/Desktop/Robot Locating/src/temp/trimmed.mp4",
-    fps=10,
+    fps=15,
     prediction_type="batch-video",
 )
 

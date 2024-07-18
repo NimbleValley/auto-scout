@@ -69,6 +69,15 @@ video {
     user-select: none;
 }
 
+#distortion-slider {
+    display: none;
+    cursor: pointer;
+}
+
+#validate-container {
+    flex-direction: column;
+}
+
 .vertical-container {
     display: flex;
     flex-direction: column;
