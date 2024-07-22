@@ -17,7 +17,8 @@ rf = Roboflow(api_key="1234")
 project = rf.workspace().project("bumper-detection-b8q8f")
 model = project.version("3").model
 
-model.confidence = 25
+model.confidence = 20
+model.iou_threshold = 20
 
 job_id, signed_url, expire_time = model.predict_video(
     "C:/Users/Owner/Desktop/Robot Locating/src/temp/trimmed.mp4",

@@ -153,9 +153,6 @@ function runDetections() {
     })
 }
 
-videoTimings.second = 15;
-getFrame();
-
 // Promise that saves the specified frame to use for field segmentation
 function getFrame() {
     let ms = parseInt(videoTimings.second) * 1000;
@@ -232,7 +229,8 @@ function detectRobots() {
         robotDetectionData = jsonOutput['bumper-detection-b8q8f'];
 
         if (renderCriteria.hasDistortion) {
-            renderFrames(robotDetectionData);
+            //renderFrames(robotDetectionData);
+            labelAlliance('blue', jsonOutput);
         }
     });
 }
@@ -240,8 +238,6 @@ function detectRobots() {
 // Renders the final gif
 async function renderFrames(data) {
     var img = await nodecanvas.loadImage(__dirname + '/img/field24.png');
-
-    console.log(img);
 
     // Delete old frames
     try {
@@ -255,7 +251,7 @@ async function renderFrames(data) {
 
     // Dimensions of frc field: 54' by 26'
     // For testing make it really big
-    const canvas = nodecanvas.createCanvas(54 * 50, 26 * 50);
+    const canvas = nodecanvas.createCanvas(54 * 40, 26 * 40);
     const ctx = canvas.getContext('2d');
 
     const encoder = new GIFEncoder(canvas.width, canvas.height);
@@ -263,7 +259,7 @@ async function renderFrames(data) {
     encoder.start();
     encoder.setRepeat(0);
     encoder.setDelay(1000 / OUTPUT_FRAMERATE_FPS / SMOOTHING);
-    encoder.setQuality(37);
+    encoder.setQuality(50);
 
     for (let i = 0; i < data.length; i++) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -274,7 +270,7 @@ async function renderFrames(data) {
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
         for (let p = 0; p < data[i].predictions.length; p++) {
-            let targetPoint = new Point(data[i].predictions[p].x, data[i].predictions[p].y);
+            let targetPoint = new Point(data[i].predictions[p].x + (data[i].predictions[p].width / 2), data[i].predictions[p].y + (data[i].predictions[p].height / 2));
             let targetSection;
 
             for (let s = 0; s < originalSections.length; s++) {
@@ -287,7 +283,7 @@ async function renderFrames(data) {
             }
 
             if (targetSection == null) {
-                console.error('Point not on field');
+                //console.error('Point not on field');
                 continue;
             }
 
@@ -297,7 +293,84 @@ async function renderFrames(data) {
             }
 
             ctx.fillStyle = data[i].predictions[p].class;
-            ctx.fillRect(newSquare.p1.worldPoint.x * 50 - 50, (26 - newSquare.p1.worldPoint.y) * 50 - 30, 60, 60);
+            ctx.fillRect(newSquare.p1.worldPoint.x * 40 - 40, (26 - newSquare.p1.worldPoint.y) * 40 - 40, 80, 80);
+        }
+
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, canvas.height - 10, canvas.width * (i / data.length), 10);
+
+        encoder.addFrame(ctx);
+
+        if (i % 5 == 0) {
+            socketio.emit('status-update', `Gif ${Math.round(i / data.length * 100)}% complete`);
+            console.log(Math.round(i / data.length * 100) + '%');
+        }
+
+        /*
+        // To save frames to temp/frames
+        const buffer = canvas.toBuffer('image/png');
+        fs.writeFileSync(__dirname + `/src/temp/frames/frame${i}.png`, buffer);
+        */
+    }
+    encoder.finish();
+    console.log('Gif complete');
+    socketio.emit('status-update', 'Gif complete');
+}
+
+// Renders final gif labeling robots
+async function renderLabeledFrames(data) {
+    var img = await nodecanvas.loadImage(__dirname + '/img/field24.png');
+
+    console.log('Ok.');
+
+    // Delete old frames
+    try {
+        fsExtra.emptyDirSync(__dirname + '/src/temp/output');
+        socketio.emit('status-update', 'Emptying folder');
+    } catch (e) {
+        console.error('Error emptying output folder', e);
+    }
+
+    socketio.emit('status-update', 'Starting gif');
+
+    // Dimensions of frc field: 54' by 26'
+    // For testing make it really big
+    const canvas = nodecanvas.createCanvas(54 * 40, 26 * 40);
+    const ctx = canvas.getContext('2d');
+
+    const encoder = new GIFEncoder(canvas.width, canvas.height);
+    encoder.createReadStream().pipe(fs.createWriteStream(__dirname + '/src/temp/output/visualization.gif'));
+    encoder.start();
+    encoder.setRepeat(0);
+    encoder.setDelay(1000 / OUTPUT_FRAMERATE_FPS / SMOOTHING);
+    encoder.setQuality(50);
+
+    let strokeColors = ['rgb(31, 206, 255)', 'rgb(133, 188, 255)', 'rgb(64, 61, 245)'];
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    
+    for (let i = 0; i < data.length - 1; i++) {
+        //ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.font = "48px serif";
+        ctx.fillStyle = 'grey';
+        //ctx.fillRect(0, 0, canvas.width, canvas.height);
+        //ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+
+        for (let p = 0; p < data[i].length; p++) {
+            ctx.fillStyle = data[i][p].class;
+            ctx.strokeStyle = strokeColors[p];
+            ctx.fillRect(data[i][p].x, data[i][p].y, 60, 60);
+
+            ctx.lineWidth = 15;
+
+            //ctx.beginPath();
+            //ctx.moveTo(data[i][p].x, data[i][p].y);
+            //ctx.lineTo(data[i + 1][p].x, data[i + 1][p].y)
+            //ctx.stroke();
+
+            ctx.fillStyle = 'black';
+            //ctx.fillText(p, data[i][p].x, data[i][p].y);
         }
 
         ctx.fillStyle = 'white';
@@ -444,8 +517,6 @@ function renderSmoothFrames(data) {
     socketio.emit('status-update', 'Gif complete');
 }
 
-//testField();
-
 function testField() {
     const image = fs.readFileSync(__dirname + '/src/duluth2.png', {
         encoding: 'base64'
@@ -471,6 +542,100 @@ function testField() {
             socketio.emit('image-error', error.message);
         });
 }
+
+function testLabeling() {
+    originalSections = [{"p1":{"screenPoint":{"x":479.29399347905724,"y":370.54125},"worldPoint":{"x":0,"y":26}},"p2":{"screenPoint":{"x":1053.1937500000001,"y":351},"worldPoint":{"x":20,"y":26}},"p3":{"screenPoint":{"x":50.859062499999936,"y":1000.6875},"worldPoint":{"x":0,"y":0}},"p4":{"screenPoint":{"x":851.265625,"y":1002.375},"worldPoint":{"x":20,"y":0}}},{"p1":{"screenPoint":{"x":1053.1937500000001,"y":351},"worldPoint":{"x":20,"y":26}},"p2":{"screenPoint":{"x":1575.83125,"y":352.6875},"worldPoint":{"x":34,"y":26}},"p3":{"screenPoint":{"x":851.265625,"y":1002.375},"worldPoint":{"x":20,"y":0}},"p4":{"screenPoint":{"x":1841.109375,"y":1004.0625},"worldPoint":{"x":34,"y":0}}},{"p1":{"screenPoint":{"x":1575.83125,"y":352.6875},"worldPoint":{"x":34,"y":26}},"p2":{"screenPoint":{"x":2107.4503229036827,"y":393.20175},"worldPoint":{"x":54,"y":26}},"p3":{"screenPoint":{"x":1841.109375,"y":1004.0625},"worldPoint":{"x":34,"y":0}},"p4":{"screenPoint":{"x":2641.5159375000003,"y":1004.0625},"worldPoint":{"x":54,"y":0}}}];
+    labelAlliance('blue', JSON.parse(fs.readFileSync(__dirname + '/src/temp/robotoutput.json').toString()));
+}
+
+function labelAlliance(color, data) {
+    let fullAlliancePredictions = [];
+    let frameOffsets = [];
+    let imageDimensions = data['bumper-detection-b8q8f'][0].image;
+    let imageDiagonal = getDistance({ x: 0, y: 0 }, { x: 54, y: 26 });
+
+    // Only include frames where 3 robots of correct alliance are detected
+    for (let i = 0; i < data['bumper-detection-b8q8f'].length/1; i++) {
+        let tempPredictions = data['bumper-detection-b8q8f'][i].predictions;
+        tempPredictions = tempPredictions.filter(element => element.class == color);
+        if ((tempPredictions.length == -1 && fullAlliancePredictions.length > 1) || tempPredictions.length == 3) {
+            for (let p = 0; p < tempPredictions.length; p++) {
+                let targetPoint = new Point(tempPredictions[p].x + (tempPredictions[p].width / 2), tempPredictions[p].y + (tempPredictions[p].height / 2));
+                let targetSection;
+
+                for (let s = 0; s < originalSections.length; s++) {
+                    let tempScreenPoints = [originalSections[s].p1.screenPoint, originalSections[s].p2.screenPoint, originalSections[s].p4.screenPoint, originalSections[s].p3.screenPoint];
+
+                    if (pointInPolygon(targetPoint, tempScreenPoints)) {
+                        targetSection = originalSections[s];
+                        break;
+                    }
+                }
+
+                if (targetSection == null) {
+                    //console.error('Point not on field');
+                    continue;
+                }
+
+                let newSquare = subdivideQuad(targetSection, targetPoint);
+                for (let i = 0; i < 5; i++) {
+                    newSquare = subdivideQuad(newSquare, targetPoint);
+                }
+                tempPredictions[p].x = newSquare.p1.worldPoint.x * 40 - 30;
+                tempPredictions[p].y = (26 - newSquare.p1.worldPoint.y) * 40 - 30;
+            }
+
+            fullAlliancePredictions.push(tempPredictions);
+            frameOffsets.push(data.frame_offset[i]);
+        }
+    }
+
+    let sortedAllianceFrames = Array.from(Array(fullAlliancePredictions.length), () => new Array(3).fill(0));
+    sortedAllianceFrames[0] = fullAlliancePredictions[0];
+    for (let i = 1; i < fullAlliancePredictions.length; i++) {
+        let sortedDistances = [];
+        for (let current = 0; current < fullAlliancePredictions[i].length; current++) {
+            for (let old = 0; old < fullAlliancePredictions[i - 1].length; old++) {
+                let score = (getDistance(fullAlliancePredictions[i][current], sortedAllianceFrames[i - 1][old]));
+                if(isNaN(score)) {
+                    console.error('Not a number!');
+                    score = 1000000;
+                }
+                sortedDistances.push({
+                    'current': current,
+                    'old': old,
+                    'distance': parseFloat(score)
+                });
+            }
+        }
+
+        if(fullAlliancePredictions[i-1].includes(0)) {
+            console.error('Uncaught 0');
+        }
+
+        sortedDistances.sort((a, b) => a.distance - b.distance);
+
+        //console.log(sortedDistances);
+
+        while (sortedDistances.length > 0 && sortedDistances[0].distance != 1000000) {
+            sortedAllianceFrames[i][sortedDistances[0].old] = fullAlliancePredictions[i][sortedDistances[0].current];
+            sortedDistances = sortedDistances.filter(element => element.current !== sortedDistances[0].current && element.old !== sortedDistances[0].old);
+        }
+
+        if(sortedAllianceFrames[i].includes(0)) {
+            sortedAllianceFrames[i][sortedAllianceFrames[i].indexOf(0)] = sortedAllianceFrames[i-1][sortedAllianceFrames[i].indexOf(0)];
+        }
+    }
+
+    //console.log(sortedAllianceFrames);
+
+    //console.log(sortedAllianceFrames[0]);
+    //console.log('\n');
+    //console.log(sortedAllianceFrames);
+
+    renderLabeledFrames(sortedAllianceFrames);
+}
+
 
 // Subdivisions/estimation
 // Top left, top right, bottom left, bottom right
@@ -549,16 +714,27 @@ function pointInPolygon(point, polygon) {
     return inside;
 }
 
+function getDistance(p1, p2) {
+    console.log(p2)
+    if(p1 == undefined || p2 == undefined || !p1.hasOwnProperty('x') || !p2.hasOwnProperty('x') || !p1.hasOwnProperty('y') || !p2.hasOwnProperty('y')) {
+        return NaN;
+    }
+    return Math.sqrt(Math.pow(p1.x - p2.x, 2), Math.pow(p1.y - p2.y, 2));
+}
+
 function getSlope(p1, p2) {
     return (p1.y - p2.y) / (p1.x - p2.x);
 }
 
-function getDistance(p1, p2) {
-    return Math.sqrt(Math.pow(p1.x - p2.x, 2), Math.pow(p1.y - p2.y, 2));
-}
-
 function getMidpoint(p1, p2) {
     return new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2)
+}
+
+function getAngle(A, B, C) {
+    var AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
+    var BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));
+    var AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
+    return Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
 }
 
 class Point {
@@ -594,3 +770,5 @@ class SectionGrid {
         this.p4 = p4;
     }
 }
+
+testLabeling();

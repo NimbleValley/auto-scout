@@ -11,6 +11,7 @@ validateContainer.style.display = 'none';
 
 const submitDistortionButton = document.getElementById('submit-distortion-button');
 submitDistortionButton.addEventListener('click', function() {
+    console.warn(JSON.stringify(originalSections));
     socket.emit('send-distortion', originalSections);
     validateContainer.style.display = 'none';
 });
@@ -140,9 +141,9 @@ function getInnerFieldCorners() {
     outerCorners[1] = new Point(outerCorners[3].x - ((1 + getSlope(outerCorners[3], vanishingPoint)) * -(innerCorners[1].point.x - innerCorners[3].point.x)), (innerCorners[3].point.y + (distortionSliderY.value * (innerCorners[1].point.y - innerCorners[3].point.y))) + (1 + getSlope(innerCorners[0].point, innerCorners[1].point)) * getDistance(innerCorners[0].point, innerCorners[1].point) / 25);
 
     originalSections = [
-        new SectionGrid(new SectionPoint(outerCorners[0], new Point(0, 26)), new SectionPoint(innerCorners[0].point, new Point(20, 26)), new SectionPoint(outerCorners[2], new Point(0, 0)), new SectionPoint(innerCorners[2].point, new Point(20, 0))),
-        new SectionGrid(new SectionPoint(innerCorners[0].point, new Point(20, 26)), new SectionPoint(innerCorners[1].point, new Point(34, 26)), new SectionPoint(innerCorners[2].point, new Point(20, 0)), new SectionPoint(innerCorners[3].point, new Point(34, 0))),
-        new SectionGrid(new SectionPoint(innerCorners[1].point, new Point(34, 26)), new SectionPoint(outerCorners[1], new Point(54, 26)), new SectionPoint(innerCorners[3].point, new Point(34, 0)), new SectionPoint(outerCorners[3], new Point(54, 0))),
+        new SectionGrid(new SectionPoint(outerCorners[0], new Point(0, 26)), new SectionPoint(innerCorners[0].point, new Point(19, 26)), new SectionPoint(outerCorners[2], new Point(0, 0)), new SectionPoint(innerCorners[2].point, new Point(19, 0))),
+        new SectionGrid(new SectionPoint(innerCorners[0].point, new Point(19, 26)), new SectionPoint(innerCorners[1].point, new Point(36, 26)), new SectionPoint(innerCorners[2].point, new Point(19, 0)), new SectionPoint(innerCorners[3].point, new Point(36, 0))),
+        new SectionGrid(new SectionPoint(innerCorners[1].point, new Point(36, 26)), new SectionPoint(outerCorners[1], new Point(54, 26)), new SectionPoint(innerCorners[3].point, new Point(36, 0)), new SectionPoint(outerCorners[3], new Point(54, 0))),
     ]
 
     return {
