@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Segment Field</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body
+    style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; height: fit-content; min-height: 100vh;">
+    <h1>Field Segmentation</h1>
+
+    <div id="validate-container">
+        <label for="x-distortion-slider">X-Distortion:</label>
+        <input type="range" name="x-distortion-slider" id="x-distortion-slider" step="0.01" min="0.5" max="1.5"
+            value="0.75">
+        <label for="y-distortion-slider">Y-Distortion:</label>
+        <input type="range" name="y-distortion-slider" id="y-distortion-slider" step="0.01" min="0.5" max="1.5"
+            value="0.95">
+        <canvas id="validate-canvas"></canvas>
+        <div style="display: flex; justify-content: space-between;">
+            <input type="text" id="distortion-name-input" style="width: 75%;" placeholder="Event Name">
+            <button id="add-distortion-button" style="width: 20%;">Add</button>
+        </div>
+    </div>
+
+    <form ref='uploadForm' id='uploadForm' action='http://localhost:8080/upload-segmentation-image' method='post'
+        encType="multipart/form-data">
+        <input type="file" name="videoFile" id="segmentation-photo-upload">
+        <button id="segment-image-button" type="submit">Segment</button>
+        <button id="segment-home-button" type="button" onclick="window.open('./index.html', '_self')">Home</button>
+    </form>
+
+    <div id="edit-segmentation-list">
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/convex-hull.js"></script>
+    <script src="./js/field-distortion.js"></script>
+</body>
+
+</html>

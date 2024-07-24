@@ -1,7 +1,10 @@
 import os
 import sys
 import json
+import os
 from roboflow import Roboflow
+
+dir_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'temp/trimmed.mp4'))
 
 # Disable
 def blockPrint():
@@ -17,11 +20,11 @@ rf = Roboflow(api_key="1234")
 project = rf.workspace().project("bumper-detection-b8q8f")
 model = project.version("3").model
 
-model.confidence = 20
+model.confidence = 40
 model.iou_threshold = 20
 
 job_id, signed_url, expire_time = model.predict_video(
-    "C:/Users/Owner/Desktop/Robot Locating/src/temp/trimmed.mp4",
+    dir_path,
     fps=15,
     prediction_type="batch-video",
 )

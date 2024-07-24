@@ -1,18 +1,26 @@
 var socket = io();
 socket.on('send-field-points-2024', handleValues);
+socket.on('done-writing-distortion', loadFields);
 
 const distortionSliderX = document.getElementById('x-distortion-slider');
 distortionSliderX.addEventListener('input', updateDistortion);
 const distortionSliderY = document.getElementById('y-distortion-slider');
 distortionSliderY.addEventListener('input', updateDistortion);
 
+const uploadForm = document.getElementById('uploadForm');
+
+const editSegmentList = document.getElementById('edit-segmentation-list');
+
 const validateContainer = document.getElementById('validate-container');
 validateContainer.style.display = 'none';
 
-const submitDistortionButton = document.getElementById('submit-distortion-button');
-submitDistortionButton.addEventListener('click', function() {
-    console.warn(JSON.stringify(originalSections));
-    socket.emit('send-distortion', originalSections);
+var fieldData;
+
+const submitDistortionButton = document.getElementById('add-distortion-button');
+submitDistortionButton.addEventListener('click', function () {
+    fieldData.push({ 'data': originalSections, 'name': document.getElementById('distortion-name-input').value});
+    socket.emit('send-distortion', fieldData);
+    uploadForm.style.display = 'flex';
     validateContainer.style.display = 'none';
 });
 
@@ -24,7 +32,40 @@ var corners;
 var segmentationData;
 var originalSections = [];
 
+async function loadFields() {
+    editSegmentList.innerHTML = '';
+
+    fieldData = await (await fetch('./stored/fields.json')).json();
+    console.log(fieldData);
+
+    if(fieldData == null) {
+        fieldData = [];
+    }
+
+    for (let i = 0; i < fieldData.length; i++) {
+        let tempContainer = document.createElement('div');
+        tempContainer.className = 'edit-segmentation-container';
+
+        let tempName = document.createElement('h3');
+        tempName.innerText = fieldData[i].name;
+
+        let tempButton = document.createElement('button');
+        tempButton.innerText = 'X';
+        tempButton.className = 'remove-segmentation-button';
+        tempButton.id = i;
+        tempButton.addEventListener('click', function() {
+            fieldData.splice(this.id, 1);
+            socket.emit('send-distortion', fieldData);
+        });
+
+        tempContainer.appendChild(tempName);
+        tempContainer.appendChild(tempButton);
+        editSegmentList.appendChild(tempContainer);
+    }
+}
+
 async function handleValues(data) {
+    uploadForm.style.display = 'none';
     validateContainer.style.display = 'flex';
 
     console.log(data);
@@ -214,7 +255,7 @@ function subdivideQuad(points, targetPoint) {
     let vanishingPoint = getIntersectionPoint(points[0].screenPoint, points[2].screenPoint, points[1].screenPoint, points[3].screenPoint);
     let secondVanishingPoint = getIntersectionPoint(points[0].screenPoint, points[1].screenPoint, points[2].screenPoint, points[3].screenPoint);
 
-    let nextLeft =  new SectionPoint(getIntersectionPoint(secondVanishingPoint, centerPoint.screenPoint, points[0].screenPoint, points[2].screenPoint), getMidpoint(points[0].worldPoint, points[2].worldPoint));
+    let nextLeft = new SectionPoint(getIntersectionPoint(secondVanishingPoint, centerPoint.screenPoint, points[0].screenPoint, points[2].screenPoint), getMidpoint(points[0].worldPoint, points[2].worldPoint));
     ctx.fillRect(nextLeft.screenPoint.x - 5, nextLeft.screenPoint.y - 5, 10, 10);
 
     let nextRight = new SectionPoint(getIntersectionPoint(secondVanishingPoint, centerPoint.screenPoint, points[1].screenPoint, points[3].screenPoint), getMidpoint(points[1].worldPoint, points[3].worldPoint));
@@ -339,3 +380,5 @@ class SectionGrid {
         this.p4 = p4;
     }
 }
+
+loadFields();

@@ -4,63 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robot Locating</title>
+    <title>Auto Scouter</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
-<body>
-    <div class="vertical-container" id="video-select-container">
-        <form>
-            <label for="youtube-link-input">Input YouTube match URL:</label>
-            <input id="youtube-link-input" type="text">
-            <button id="youtube-link-submit">Enter</button>
-        </form>
-        <h1>or</h1>
-        <form>
-            <label for="youtube-file-input">Input video file:</label>
-            <input id="youtube-file-input" type="file" accept="video/mp4,video/x-m4v,video/*" name="videoFile">
-        </form>
-    </div>
-
-    <div id="video-trim-container">
-        <video id="trimming-video">
-            <source src="" type="video/mp4">
-        </video>
-
-        <section class="range-slider">
-            <span class="rangeValues"></span>
-            <input value="0" min="0" max="15" step="1" type="range">
-            <input value="0" min="0" max="15" step="1" type="range">
-        </section>
-
-        <form ref='uploadForm' id='uploadForm' action='http://localhost:8080/upload' method='post'
-            encType="multipart/form-data">
-            <input type="file" name="videoFile" id="fake-video-upload">
-            <button id="select-frame-button" type="button">Select Frame</button>
-            <button id="trim-video-button" type="submit">Trim Video</button>
-            <button id="skip-trim-video-button" type="submit">Skip trim</button>
-        </form>
-    </div>
-
-    <div id="status-container">
-        <h2>Status:</h2>
-    </div>
-
-    <div id="validate-container">
-        <label for="x-distortion-slider">X-Distortion:</label>
-        <input type="range" name="x-distortion-slider" id="x-distortion-slider" step="0.01" min="0.5" max="1.5" value="0.75">
-        <label for="y-distortion-slider">Y-Distortion:</label>
-        <input type="range" name="y-distortion-slider" id="y-distortion-slider" step="0.01" min="0.5" max="1.5" value="0.95">
-        <canvas id="validate-canvas"></canvas>
-        <button id="submit-distortion-button">Enter</button>
+<body style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; height: 100vh;">
+    <h1>Auto Scouter</h1>
+    <div style="display: flex; flex-direction: column;">
+        <button class="homescreen-button" onclick="window.open('./label.html', '_self')">Detect Autos</button>
+        <button class="homescreen-button">Visualize Autos</button>
+        <button class="homescreen-button" onclick="window.open('./segment.html', '_self')">Segment Field</button>
     </div>
 </body>
-
-<script src="/socket.io/socket.io.js"></script>
-<script src="js/trim.js" type="module"></script>
-<script src="js/client.js" type="module"></script>
-<script src="js/status.js" type="module"></script>
-<script src="js/convex-hull.js"></script>
-<script src="js/field-distortion.js" type="module"></script>
 
 </html>

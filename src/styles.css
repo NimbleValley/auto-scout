@@ -1,13 +1,47 @@
+:root {
+    --main-color: orange;
+    --background-color: rgb(51, 50, 49)
+}
+
+@font-face {
+    font-family: BDNippori;
+    src: url("./fonts/BD_Nippori_05.otf") format("opentype");
+}
+
+body {
+    margin: 0;
+    background-color: var(--background-color);
+}
+
+h1 {
+    font-family: BDNippori;
+    font-size: 10vh;
+    user-select: none;
+    color: var(--main-color);
+}
+
+h4 {
+    color: var(--main-color);
+    font-size: 4vh;
+    margin: 0;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: lighter;
+    user-select: none;
+}
+
 button {
-    font-size: 2.75vh;
+    font-size: 5vh;
     transition: background-color 0.25s, color 0.15s, border-radius 0.25s;
     background-color: rgb(223, 223, 223);
     border-radius: 0.5vh;
+    border: solid 1vh var(--main-color);
+    background-color: transparent;
+    color: var(--main-color);
 }
 
 button:hover {
-    background-color: rgb(82, 82, 82);
-    color: white;
+    background-color: var(--main-color);
+    color: var(--background-color);
     cursor: pointer;
     border-radius: 0vh;
 }
@@ -15,36 +49,55 @@ button:hover {
 label {
     font-size: 2.5vh;
     user-select: none;
+    color: var(--main-color);
 }
 
-input {
-    font-size: 2.75vh;
-    height: 100%;
-    border: 0.25vh solid black;
+input, select {
+    font-size: 5vh;
+    transition: background-color 0.25s, color 0.15s, border-radius 0.25s;
+    background-color: rgb(223, 223, 223);
     border-radius: 0.5vh;
+    border: solid 1vh var(--main-color);
+    background-color: transparent;
+    color: var(--main-color);
+}
+
+input:hover, select:hover {
+    background-color: var(--main-color);
+    color: var(--background-color);
     cursor: pointer;
+    border-radius: 0vh;
 }
 
 input:focus {
-    background-color: rgb(199, 199, 199);
+    background-color: var(--main-color);
+    color: var(--background-color) !important;
 }
 
 input[type=file]::file-selector-button {
     color: black;
-    border-color: #454622;
+    border-color: var(--main-color);
     transition: color 0.15s, background-color 0.0s;
     cursor: pointer;
     border: none;
+    background-color: transparent;
+    font-size: 5vh;
+    color: var(--main-color);
 }
 
 input[type=file]:hover::file-selector-button {
-    background-color: rgb(199, 199, 199);
+    background-color: var(--main-color);
     cursor: pointer;
     border: none;
+    color: var(--background-color);
 }
 
 video {
     width: 75vw;
+}
+
+canvas {
+    max-width: 100vw;
 }
 
 #video-trim-container {
@@ -76,6 +129,22 @@ video {
 
 #validate-container {
     flex-direction: column;
+    max-width: 95vw;
+}
+
+.homescreen-button {
+    font-size: 4vh;
+    background-color: transparent;
+    border: solid 1vh var(--main-color);
+    padding: 2vh 3vh 2vh 3vh;
+    color: var(--main-color);
+    font-family: BDNippori;
+    margin-top: 4vh;
+}
+
+.homescreen-button:hover {
+    background-color: var(--main-color);
+    color: var(--background-color);
 }
 
 .vertical-container {
@@ -85,20 +154,103 @@ video {
     width: fit-content;
 }
 
+.horizontal-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: fit-content;
+}
+
+/* 
+--
+Edit segmentaion area 
+--
+*/
+h3 {
+    color: white;
+    font-size: 5vh;
+    margin: 0;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: lighter;
+    user-select: none;
+}
+
+#edit-segmentation-list {
+    background-color: rgb(99, 95, 95);
+    border-radius: 2vh;
+    padding: 0vw 4vh 4vh 4vh;
+    width: 50vw;
+    margin-top: 5vh;
+}
+
+.edit-segmentation-container {
+    background-color: #454622;
+    padding: 2vh;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4vh;
+}
+
+.remove-segmentation-button {
+    font-weight: bold;
+    background-color: transparent;
+    border: solid 1vh rgb(238, 73, 73);
+    color: rgb(238, 73, 73);
+    font-size: 4vh;
+}
+
+.remove-segmentation-button:hover {
+    background-color: rgb(238, 73, 73);
+    color: #454622;
+}
+
+/*
+--
+Robot Generation
+--
+*/
+#robot-generation-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#label-input-container {
+    display: grid;
+    grid-template-rows: auto auto auto;
+    grid-template-columns: auto auto;
+    grid-auto-flow: column;
+}
+
+.team-number-input {
+    color: black;
+    border: 0.5vh solid black;
+    font-size: 3.5vh;
+    text-align: center;
+    font-weight: bold;
+}
+
+.team-number-input:hover {
+    color: black;
+}
+
+.team-number-input:active {
+    color: black;
+}
 
 
 
 
 /* Slider styles */
 
-section.range-slider {
+range-slider {
     position: relative;
     width: 100%;
     height: 5vh;
     text-align: center;
 }
 
-section.range-slider input {
+range-slider input {
     pointer-events: none;
     position: absolute;
     overflow: hidden;
@@ -111,7 +263,7 @@ section.range-slider input {
     padding: 0;
 }
 
-section.range-slider input::-webkit-slider-thumb {
+range-slider input::-webkit-slider-thumb {
     pointer-events: all;
     position: relative;
     z-index: 1;
@@ -119,7 +271,7 @@ section.range-slider input::-webkit-slider-thumb {
     scale: 2;
 }
 
-section.range-slider input::-moz-range-thumb {
+range-slider input::-moz-range-thumb {
     pointer-events: all;
     position: relative;
     z-index: 10;
@@ -128,20 +280,20 @@ section.range-slider input::-moz-range-thumb {
     scale: 2;
 }
 
-section.range-slider input::-moz-range-track {
+range-slider input::-moz-range-track {
     position: relative;
     z-index: -1;
     background-color: rgba(0, 0, 0, 1);
     border: 0;
 }
 
-section.range-slider input:last-of-type::-moz-range-track {
+range-slider input:last-of-type::-moz-range-track {
     -moz-appearance: none;
     background: none transparent;
     border: 0;
 }
 
-section.range-slider input[type=range]::-moz-focus-outer {
+range-slider input[type=range]::-moz-focus-outer {
     border: 0;
 }
 
@@ -164,4 +316,5 @@ span.rangeValues {
     font-size: 2vh;
     font-weight: bold;
     user-select: none;
+    color: var(--main-color);
 }

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Locating</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="horizontal-container" id="video-select-container">
+        <!--<form>
+            <label for="youtube-link-input">Input YouTube match URL:</label>
+            <input id="youtube-link-input" type="text">
+            <button id="youtube-link-submit">Enter</button>
+        </form>
+        <h3>or</h3>-->
+        <form>
+            <label for="youtube-file-input">Input video file:</label>
+            <input id="youtube-file-input" type="file" accept="video/mp4,video/x-m4v,video/*" name="videoFile">
+            <select name="event-select" id="event-select" >
+                <option selected disabled>Select Event</option>
+            </select>
+            <button id="label-auto-button">Label</button>
+        </form>
+    </div>
+
+    <div id="video-trim-container">
+        <video id="trimming-video">
+            <source src="" type="video/mp4">
+        </video>
+
+        <!--<section class="range-slider">
+            <span class="rangeValues"></span>
+            <input value="0" min="0" max="15" step="1" type="range">
+            <input value="0" min="0" max="15" step="1" type="range">
+        </section>-->
+        <input value="0" min="0" max="15" step="1" type="range" id="auto-start-slider">
+
+        <form ref='uploadForm' id='uploadForm' action='http://localhost:8080/upload' method='post'
+            encType="multipart/form-data">
+            <input type="file" name="videoFile" id="fake-video-upload">
+            <button id="trim-video-button" type="submit">Trim Video</button>
+            <button id="skip-trim-video-button" type="submit">Skip trim</button>
+        </form>
+    </div>
+
+    <div id="status-container">
+        <h2>Status:</h2>
+    </div>
+
+    <div id="robot-generation-container">
+        <canvas id="user-labeling-canvas"></canvas>
+        <div id="label-input-container">
+            <input type="text" name="team-number-input" class="team-number-input">
+            <input type="text" name="team-number-input" class="team-number-input">
+            <input type="text" name="team-number-input" class="team-number-input">
+            <input type="text" name="team-number-input" class="team-number-input">
+            <input type="text" name="team-number-input" class="team-number-input">
+            <input type="text" name="team-number-input" class="team-number-input">
+        </div>
+        <button id="generate-files-button">Generate Files</button>
+    </div>
+</body>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/trim.js" type="module"></script>
+<script src="js/status.js" type="module"></script>
+<script src="js/label-auto.js" type="module"></script>
+
+</html>

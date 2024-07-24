@@ -27,9 +27,10 @@ export function getTimes() {
     }
 }
 
+/*
 window.onload = function () {
     // Initialize Sliders
-    let sliderSections = document.getElementsByClassName("range-slider");
+    /*let sliderSections = document.getElementsByClassName("range-slider");
     for (var x = 0; x < sliderSections.length; x++) {
         var sliders = sliderSections[x].getElementsByTagName("input");
         for (var y = 0; y < sliders.length; y++) {
@@ -41,11 +42,21 @@ window.onload = function () {
         }
     }
 }
+*/
+
+let startSlider = document.getElementById('auto-start-slider');
+startSlider.addEventListener('input', function() {
+    // Set video time
+    document.getElementById('trimming-video').currentTime = this.value;
+
+    startTime = parseInt(this.value);
+    endTime = parseInt(this.value) + 15.5;
+});
 
 export function updateSliderMax() {
     let value = Math.round(document.getElementById('trimming-video').duration);
 
-    let sliderSections = document.getElementsByClassName("range-slider");
+    /*let sliderSections = document.getElementsByClassName("range-slider");
     for (var x = 0; x < sliderSections.length; x++) {
         let sliders = sliderSections[x].getElementsByTagName("input");
         for (var y = 0; y < sliders.length; y++) {
@@ -53,5 +64,6 @@ export function updateSliderMax() {
                 sliders[y].max = value;
             }
         }
-    }
+    }*/
+    document.getElementById('auto-start-slider').max = value;
 }
