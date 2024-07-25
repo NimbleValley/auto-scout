@@ -20,8 +20,8 @@ rf = Roboflow(api_key="1234")
 project = rf.workspace().project("bumper-detection-b8q8f")
 model = project.version("3").model
 
-model.confidence = 40
-model.iou_threshold = 20
+model.confidence = 50
+model.iou_threshold = 25
 
 job_id, signed_url, expire_time = model.predict_video(
     dir_path,

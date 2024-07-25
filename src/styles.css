@@ -238,6 +238,15 @@ Robot Generation
     color: black;
 }
 
+/*
+--
+Robot Generation
+--
+*/
+
+#visualize-canvas {
+    max-width: 85vw;
+}
 
 
 

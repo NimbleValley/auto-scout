@@ -60,6 +60,8 @@ socketio.on('connection', (socket) => {
     });
     socket.on('generate-files', async function (teams) {
         let parsedTeams = JSON.parse(teams);
+        console.log(parsedTeams.blue);
+        console.log(parsedTeams.red);
         labelAlliance('blue', robotDetectionData, parsedTeams.blue);
         labelAlliance('red', robotDetectionData, parsedTeams.red);
     });
@@ -435,8 +437,135 @@ function testField() {
 }
 
 function testLabeling() {
-    originalSections = [{ "p1": { "screenPoint": { "x": 479.29399347905724, "y": 370.54125 }, "worldPoint": { "x": 0, "y": 26 } }, "p2": { "screenPoint": { "x": 1053.1937500000001, "y": 351 }, "worldPoint": { "x": 20, "y": 26 } }, "p3": { "screenPoint": { "x": 50.859062499999936, "y": 1000.6875 }, "worldPoint": { "x": 0, "y": 0 } }, "p4": { "screenPoint": { "x": 851.265625, "y": 1002.375 }, "worldPoint": { "x": 20, "y": 0 } } }, { "p1": { "screenPoint": { "x": 1053.1937500000001, "y": 351 }, "worldPoint": { "x": 20, "y": 26 } }, "p2": { "screenPoint": { "x": 1575.83125, "y": 352.6875 }, "worldPoint": { "x": 34, "y": 26 } }, "p3": { "screenPoint": { "x": 851.265625, "y": 1002.375 }, "worldPoint": { "x": 20, "y": 0 } }, "p4": { "screenPoint": { "x": 1841.109375, "y": 1004.0625 }, "worldPoint": { "x": 34, "y": 0 } } }, { "p1": { "screenPoint": { "x": 1575.83125, "y": 352.6875 }, "worldPoint": { "x": 34, "y": 26 } }, "p2": { "screenPoint": { "x": 2107.4503229036827, "y": 393.20175 }, "worldPoint": { "x": 54, "y": 26 } }, "p3": { "screenPoint": { "x": 1841.109375, "y": 1004.0625 }, "worldPoint": { "x": 34, "y": 0 } }, "p4": { "screenPoint": { "x": 2641.5159375000003, "y": 1004.0625 }, "worldPoint": { "x": 54, "y": 0 } } }];
-    labelAlliance('blue', JSON.parse(fs.readFileSync(__dirname + '/src/temp/robotoutput.json').toString()));
+    originalSections = [
+        {
+            "p1": {
+                "screenPoint": {
+                    "x": 464.404367608027,
+                    "y": 511.396875
+                },
+                "worldPoint": {
+                    "x": 0,
+                    "y": 26
+                }
+            },
+            "p2": {
+                "screenPoint": {
+                    "x": 981.15,
+                    "y": 487.6875
+                },
+                "worldPoint": {
+                    "x": 20,
+                    "y": 26
+                }
+            },
+            "p3": {
+                "screenPoint": {
+                    "x": 62.054999999999836,
+                    "y": 941.625
+                },
+                "worldPoint": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            "p4": {
+                "screenPoint": {
+                    "x": 759.5999999999999,
+                    "y": 961.875
+                },
+                "worldPoint": {
+                    "x": 20,
+                    "y": 0
+                }
+            }
+        },
+        {
+            "p1": {
+                "screenPoint": {
+                    "x": 981.15,
+                    "y": 487.6875
+                },
+                "worldPoint": {
+                    "x": 20,
+                    "y": 26
+                }
+            },
+            "p2": {
+                "screenPoint": {
+                    "x": 1483.59375,
+                    "y": 507.9375
+                },
+                "worldPoint": {
+                    "x": 34,
+                    "y": 26
+                }
+            },
+            "p3": {
+                "screenPoint": {
+                    "x": 759.5999999999999,
+                    "y": 961.875
+                },
+                "worldPoint": {
+                    "x": 20,
+                    "y": 0
+                }
+            },
+            "p4": {
+                "screenPoint": {
+                    "x": 1748.6625,
+                    "y": 982.125
+                },
+                "worldPoint": {
+                    "x": 34,
+                    "y": 0
+                }
+            }
+        },
+        {
+            "p1": {
+                "screenPoint": {
+                    "x": 1483.59375,
+                    "y": 507.9375
+                },
+                "worldPoint": {
+                    "x": 34,
+                    "y": 26
+                }
+            },
+            "p2": {
+                "screenPoint": {
+                    "x": 1973.386019047953,
+                    "y": 552.554625
+                },
+                "worldPoint": {
+                    "x": 54,
+                    "y": 26
+                }
+            },
+            "p3": {
+                "screenPoint": {
+                    "x": 1748.6625,
+                    "y": 982.125
+                },
+                "worldPoint": {
+                    "x": 34,
+                    "y": 0
+                }
+            },
+            "p4": {
+                "screenPoint": {
+                    "x": 2446.2075,
+                    "y": 982.125
+                },
+                "worldPoint": {
+                    "x": 54,
+                    "y": 0
+                }
+            }
+        }
+    ];
+    labelAlliance('blue', JSON.parse(fs.readFileSync(__dirname + '/src/temp/robotoutput.json').toString()), [93, 3197, 6421]);
 }
 
 async function testUserLabeling() {
@@ -634,11 +763,11 @@ async function labelAlliance(color, data, teams) {
         }
     }
 
-    await exportLabeledFrames(smoothedAllianceFrames, teams);
+    await exportLabeledFrames(smoothedAllianceFrames, teams, newFrameOffsets);
     //renderLabeledFrames(smoothedAllianceFrames);
 }
 
-function exportLabeledFrames(frames, teams) {
+function exportLabeledFrames(frames, teams, offsets) {
     return new Promise((resolve, reject) => {
         let written = 0;
         for (let i = 0; i < frames[0].length; i++) {
@@ -647,8 +776,11 @@ function exportLabeledFrames(frames, teams) {
                 currentFrames.push(frames[p][i]);
             }
             let data = {
-                'robot_id': i,
-                'predictions': currentFrames
+                'team': teams[i],
+                'alliance': frames[0][i].class,
+                'predictions': currentFrames,
+                'start': offsets[0],
+                'end': offsets[offsets.length - 1]
             }
             let formattedData = JSON.stringify(data);
             writeJSON(`${__dirname}/src/temp/output/robot${teams[i]}.json`, formattedData).then(() => {
@@ -669,9 +801,10 @@ function writeJSON(dir, data) {
 
             // Success 
             console.log("Done writing");
+            socketio.emit('status-update', 'Wrote to ' + dir);
             resolve();
         });
     });
 }
 
-//testLabeling();
+testLabeling();
