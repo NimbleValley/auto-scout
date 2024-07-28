@@ -35,7 +35,10 @@ enablePrint()
 
 parsed = json.dumps(results, indent=4, sort_keys=True)
 
-f = open("C:/Users/Owner/Desktop/Robot Locating/src/temp/robotoutput.json", "w")
+# Forgot to add this, add tonight
+write_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'temp/robotoutput.json'))
+
+f = open(write_path, "w")
 f.write(parsed)
 f.close()
 

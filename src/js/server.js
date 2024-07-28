@@ -738,24 +738,33 @@ async function labelAlliance(color, data, teams) {
 
     // Now we have all the frames and robots sorted, smooth it out:
     for (let i = 1; i < sortedAllianceFrames.length; i++) {
+
+        // No skipped frames, continue to next
         if (frameOffsets[i] - frameOffsets[i - 1] == 30 / OUTPUT_FRAMERATE_FPS) {
             smoothedAllianceFrames.push(sortedAllianceFrames[i - 1]);
             newFrameOffsets.push(frameOffsets[i - 1]);
             continue;
         }
+
+        // How many frames were skipped
         let elapsedFrames = (frameOffsets[i] - frameOffsets[i - 1]) / (30 / OUTPUT_FRAMERATE_FPS);
+        
+        // Create new frames for all those that were skipped
         for (let f = 0; f < elapsedFrames; f++) {
             let estimatedFrame = [];
+
+            // New estimated frames
             for (let p = 0; p < sortedAllianceFrames[i - 1].length; p++) {
+                let oldFrame = sortedAllianceFrames[i - 1][p];
                 estimatedFrame.push({
-                    'class': sortedAllianceFrames[i - 1][p].class,
-                    'class_id': sortedAllianceFrames[i - 1][p].class_id,
+                    'class': oldFrame.class,
+                    'class_id': oldFrame.class_id,
                     'confidence': -1,
                     'detection_id': 'estimated_frame',
-                    'height': sortedAllianceFrames[i - 1][p].height,
-                    'width': sortedAllianceFrames[i - 1][p].width,
-                    'x': sortedAllianceFrames[i - 1][p].x + ((sortedAllianceFrames[i][p].x - sortedAllianceFrames[i - 1][p].x) * ((f + 1) / (elapsedFrames + 1))),
-                    'y': sortedAllianceFrames[i - 1][p].y + ((sortedAllianceFrames[i][p].y - sortedAllianceFrames[i - 1][p].y) * ((f + 1) / (elapsedFrames + 1))),
+                    'height': oldFrame.height,
+                    'width': oldFrame.width,
+                    'x': oldFrame.x + ((sortedAllianceFrames[i][p].x - oldFrame.x) * ((f + 1) / (elapsedFrames + 1))),
+                    'y': oldFrame.y + ((sortedAllianceFrames[i][p].y - oldFrame.y) * ((f + 1) / (elapsedFrames + 1))),
                 });
             }
             smoothedAllianceFrames.push(estimatedFrame);
@@ -763,6 +772,7 @@ async function labelAlliance(color, data, teams) {
         }
     }
 
+    // Now save to files
     await exportLabeledFrames(smoothedAllianceFrames, teams, newFrameOffsets);
     //renderLabeledFrames(smoothedAllianceFrames);
 }
@@ -807,4 +817,4 @@ function writeJSON(dir, data) {
     });
 }
 
-testLabeling();
+//testLabeling();
