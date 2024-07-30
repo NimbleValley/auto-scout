@@ -14,13 +14,30 @@ const editSegmentList = document.getElementById('edit-segmentation-list');
 const validateContainer = document.getElementById('validate-container');
 validateContainer.style.display = 'none';
 
+const distortionRangeInput = document.getElementById('distortion-frame-input');
+const videoPlayer = document.getElementById('distortion-video');
+const segmentationVideoUpload = document.getElementById('segmentation-video-upload');
+segmentationVideoUpload.addEventListener('change', function (e) {
+    // The file
+    let videoFile = e.target.files[0];
+
+    // Now set the video's source to the uploaded file
+    videoPlayer.src = URL.createObjectURL(videoFile);
+
+    distortionRangeInput.max = videoPlayer.duration;
+});
+
+distortionRangeInput.addEventListener('input', function() {
+    videoPlayer.currentTime = this.value;
+});
+
 var fieldData;
 
 const submitDistortionButton = document.getElementById('add-distortion-button');
 submitDistortionButton.addEventListener('click', function () {
     fieldData.push({ 'data': originalSections, 'name': document.getElementById('distortion-name-input').value});
     socket.emit('send-distortion', fieldData);
-    uploadForm.style.display = 'flex';
+    uploadForm.style.display = 'block';
     validateContainer.style.display = 'none';
 });
 
@@ -38,7 +55,7 @@ async function loadFields() {
     fieldData = await (await fetch('./stored/fields.json')).json();
     console.log(fieldData);
 
-    if(fieldData == null) {
+    if (fieldData == null) {
         fieldData = [];
     }
 
@@ -53,7 +70,7 @@ async function loadFields() {
         tempButton.innerText = 'X';
         tempButton.className = 'remove-segmentation-button';
         tempButton.id = i;
-        tempButton.addEventListener('click', function() {
+        tempButton.addEventListener('click', function () {
             fieldData.splice(this.id, 1);
             socket.emit('send-distortion', fieldData);
         });

@@ -1,4 +1,5 @@
 import { getDistance, pointInPolygon, subdivideQuad, Point } from './helpers.js'
+import { videoScale } from './crop-video.js';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
 import express from 'express';
@@ -43,6 +44,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(express.static('./src'));
+app.use(express.json({ limit: '1000mb', extended: true }));
 
 const server = createServer(app);
 server.listen(PORT, function () {
@@ -76,7 +78,6 @@ app.post('/trim', function (req, res) {
         'distortion': req.body.distortion
     }
     originalSections = JSON.parse(outputSettings.distortion);
-    console.log(originalSections.length)
     console.log(outputSettings);
 
     res.end();
@@ -120,11 +121,13 @@ app.post('/upload', function (req, res) {
 
 });
 
-// Upload the field imageo
-app.post('/upload-segmentation-image', function (req, res) {
+// Upload the field video
+app.post('/upload-segmentation-video', function (req, res) {
     let sampleFile;
     let uploadPath;
     console.log('Uploaded');
+
+    console.log(req.body.frame);
 
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).send('No files were uploaded.');
@@ -132,13 +135,16 @@ app.post('/upload-segmentation-image', function (req, res) {
 
     // The name of the input field (i.e. 'sampleFile') is used to retrieve the uploaded file
     sampleFile = req.files.videoFile;
-    uploadPath = __dirname + '/src/temp/fieldframe.jpg';
+    uploadPath = __dirname + '/src/temp/segment.mp4';
 
     sampleFile.mv(uploadPath, async function (err) {
         if (err)
             return res.status(500).send(err);
 
-        segmentField(2024);
+        getFrame(parseFloat(req.body.frame) * 30, __dirname + '/src/temp/fieldframe.jpg').then(() => {
+            segmentField(2024);
+        });
+
         res.status(204).send();
     });
 });
@@ -168,6 +174,10 @@ function trimVideo() {
     });
 }
 
+function cropVideo(width, height) {
+    videoScale(__dirname + '/src/temp/trimmed.mp4', width, height);
+}
+
 // Video has been trimmed, now run all detections
 function runDetections() {
     detectRobots();
@@ -176,11 +186,12 @@ function runDetections() {
 // Promise that saves the specified frame to use for field segmentation
 function getFrame(frame, destination) {
     let ms = parseInt(frame / (OUTPUT_FRAMERATE_FPS * 2)) * 1000;
+    console.log('Getting frame');
 
     return new Promise(async (resolve, reject) => {
         try {
             await extractFrames({
-                input: __dirname + '/src/temp/trimmed.mp4',
+                input: __dirname + '/src/temp/segment.mp4',
                 output: destination,
                 offsets: [
                     ms
@@ -575,11 +586,11 @@ async function testUserLabeling() {
     const imgBinary = fs.readFileSync(__dirname + '/src/temp/labelingframe.jpg')
 
     let jsonOutput = JSON.parse(fs.readFileSync(__dirname + '/src/temp/robotoutput.json').toString());
-    
+
     // TESTING ONLY
     robotDetectionData = jsonOutput;
     originalSections = [{ "p1": { "screenPoint": { "x": 479.29399347905724, "y": 370.54125 }, "worldPoint": { "x": 0, "y": 26 } }, "p2": { "screenPoint": { "x": 1053.1937500000001, "y": 351 }, "worldPoint": { "x": 20, "y": 26 } }, "p3": { "screenPoint": { "x": 50.859062499999936, "y": 1000.6875 }, "worldPoint": { "x": 0, "y": 0 } }, "p4": { "screenPoint": { "x": 851.265625, "y": 1002.375 }, "worldPoint": { "x": 20, "y": 0 } } }, { "p1": { "screenPoint": { "x": 1053.1937500000001, "y": 351 }, "worldPoint": { "x": 20, "y": 26 } }, "p2": { "screenPoint": { "x": 1575.83125, "y": 352.6875 }, "worldPoint": { "x": 34, "y": 26 } }, "p3": { "screenPoint": { "x": 851.265625, "y": 1002.375 }, "worldPoint": { "x": 20, "y": 0 } }, "p4": { "screenPoint": { "x": 1841.109375, "y": 1004.0625 }, "worldPoint": { "x": 34, "y": 0 } } }, { "p1": { "screenPoint": { "x": 1575.83125, "y": 352.6875 }, "worldPoint": { "x": 34, "y": 26 } }, "p2": { "screenPoint": { "x": 2107.4503229036827, "y": 393.20175 }, "worldPoint": { "x": 54, "y": 26 } }, "p3": { "screenPoint": { "x": 1841.109375, "y": 1004.0625 }, "worldPoint": { "x": 34, "y": 0 } }, "p4": { "screenPoint": { "x": 2641.5159375000003, "y": 1004.0625 }, "worldPoint": { "x": 54, "y": 0 } } }];
-    
+
     let data = jsonOutput['bumper-detection-b8q8f'];
 
     let bluePrediction;
@@ -615,8 +626,8 @@ async function testUserLabeling() {
 async function requestUserLabeling() {
     await getFrame(5, __dirname + '/src/temp/labelingframe.jpg');
     const imgBinary = fs.readFileSync(__dirname + '/src/temp/labelingframe.jpg')
-    
-    
+
+
     let data = robotDetectionData['bumper-detection-b8q8f'];
     let bluePrediction;
     let redPrediction;
@@ -748,7 +759,7 @@ async function labelAlliance(color, data, teams) {
 
         // How many frames were skipped
         let elapsedFrames = (frameOffsets[i] - frameOffsets[i - 1]) / (30 / OUTPUT_FRAMERATE_FPS);
-        
+
         // Create new frames for all those that were skipped
         for (let f = 0; f < elapsedFrames; f++) {
             let estimatedFrame = [];
@@ -817,4 +828,4 @@ function writeJSON(dir, data) {
     });
 }
 
-//testLabeling();
+//cropVideo(270, 365);

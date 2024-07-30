@@ -26,11 +26,17 @@
         </div>
     </div>
 
-    <form ref='uploadForm' id='uploadForm' action='http://localhost:8080/upload-segmentation-image' method='post'
+    <form ref='uploadForm' id='uploadForm' action='http://localhost:8080/upload-segmentation-video' method='post'
         encType="multipart/form-data">
-        <input type="file" name="videoFile" id="segmentation-photo-upload">
+        <input type="file" name="videoFile" id="segmentation-video-upload">
         <button id="segment-image-button" type="submit">Segment</button>
         <button id="segment-home-button" type="button" onclick="window.open('./index.html', '_self')">Home</button>
+        <div style="display: flex; flex-direction: column;">
+            <video id="distortion-video">
+                <source src="" type="video/mp4">
+            </video>
+            <input type="range" name="frame" id="distortion-frame-input" min="0" max="1" value="0" step="0.5">
+        </div>
     </form>
 
     <div id="edit-segmentation-list">
