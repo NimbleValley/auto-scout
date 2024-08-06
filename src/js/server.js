@@ -27,7 +27,7 @@ var outputSettings = {
 
 const OUTPUT_FRAMERATE_FPS = 15;
 const SMOOTHING = 1;
-const API_KEY = '1234';
+const API_KEY = '';
 
 var robotDetectionData;
 var originalSections;

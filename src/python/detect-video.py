@@ -16,7 +16,7 @@ def enablePrint():
     
 blockPrint()
 
-rf = Roboflow(api_key="1234")
+rf = Roboflow(api_key="")
 project = rf.workspace().project("bumper-detection-b8q8f")
 model = project.version("3").model
 
